@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mini 4 Lab — DJI Mini 4 Pro e RC 2</title>
+<style>
+:root{
+  --bg:#f3f6f7;--card:#fff;--text:#20343e;--muted:#627780;
+  --line:#dbe5e8;--accent:#087d6b;--soft:#e8f5ef;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select{font:inherit}
+button,a,input,select{touch-action:manipulation}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid #22b89a;outline-offset:3px
+}
+button{border:1px solid var(--line);border-radius:8px;padding:10px 14px;
+  background:white;color:var(--text)}
+button:hover{background:var(--soft)}
+.primary{background:var(--accent);color:white;border-color:var(--accent)}
+.primary:hover{background:#056451}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:30px;line-height:1.2;margin-bottom:10px}
+h2{font-size:22px;line-height:1.3}
+h3{font-size:17px}
+small,.small{font-size:14px}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+aside{background:white;border-right:1px solid var(--line);padding:22px 14px}
+.brand{font-size:26px;font-weight:750;padding:0 10px 22px;color:var(--accent)}
+.brand small{display:block;font-size:12px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1px}
+nav{display:grid;gap:5px}
+nav button{text-align:left;border-color:transparent;font-size:14px}
+nav button.active{background:var(--soft);color:var(--accent);font-weight:700}
+main{min-width:0}
+header{display:flex;justify-content:space-between;align-items:center;
+  padding:15px 26px;background:white;border-bottom:1px solid var(--line);gap:15px}
+header span{font-size:14px;color:var(--muted)}
+#menuButton{display:none}
+.page{max-width:1400px;padding:28px;margin:auto}
+.heading{display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:16px;margin-bottom:20px}
+.heading p{margin:0;color:var(--muted)}
+.eyebrow{font-size:12px;letter-spacing:1px;font-weight:700;color:var(--accent)}
+.notice{padding:13px 16px;border-radius:8px;background:var(--soft);
+  color:#315e52;margin-bottom:22px;font-size:14px}
+.columns{display:grid;grid-template-columns:minmax(0,1fr) 325px;gap:24px;align-items:start}
+.card{padding:24px;background:white;border:1px solid var(--line);
+  border-radius:12px;margin-bottom:20px;min-width:0}
+.muted{color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;
+  gap:15px;flex-wrap:wrap;margin:18px 0}
+.field{display:block;margin:22px 0}
+.field>span{display:block;font-weight:600;margin-bottom:8px}
+input[type=number],select{width:100%;padding:11px;border:1px solid #bdcfca;
+  border-radius:7px;background:#f9fcfa;color:var(--text)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=checkbox]{width:19px;height:19px;accent-color:var(--accent);flex-shrink:0}
+.check{display:flex;gap:10px;align-items:flex-start;margin:15px 0;font-size:14px}
+.buttons{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+.result{padding:15px;border-left:4px solid var(--accent);background:var(--soft);
+  border-radius:0 8px 8px 0;margin:18px 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.stat{text-align:center;background:var(--soft);padding:15px;border-radius:8px}
+.stat strong{display:block;font-size:32px;color:var(--accent)}
+.stat small{color:var(--muted)}
+.steps{list-style:none;padding:0;counter-reset:step}
+.steps li{display:flex;gap:10px;margin:14px 0;color:var(--muted);font-size:14px}
+.steps li:before{counter-increment:step;content:counter(step);width:24px;height:24px;
+  border-radius:50%;background:#edf2f2;display:grid;place-items:center;flex-shrink:0}
+.steps li.current{font-weight:700;color:var(--accent)}
+.steps li.current:before,.steps li.done:before{background:var(--accent);color:white}
+progress{width:100%;height:9px;accent-color:var(--accent)}
+.guide-body{border-top:1px solid var(--line);padding-top:20px}
+.screen{position:relative;min-height:345px;background:#183c47;color:white;
+  border-radius:10px;padding:15px;overflow:hidden}
+.screen:before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to right,transparent 33%,#ffffff18 33.2%,transparent 33.5%,
+  transparent 66%,#ffffff18 66.2%,transparent 66.5%),
+  linear-gradient(to bottom,transparent 33%,#ffffff18 33.2%,transparent 33.5%,
+  transparent 66%,#ffffff18 66.2%,transparent 66.5%)}
+.screen button{background:#0e2737cc;border-color:#ffffff33;color:white;font-size:14px}
+.screen-top{position:relative;display:flex;gap:7px;flex-wrap:wrap;justify-content:space-between}
+.screen-center{position:absolute;inset:105px 55px 85px;display:grid;place-items:center;
+  text-align:center;pointer-events:none}
+.screen-center strong{display:block;font-size:32px}
+.screen-center small{color:#c3d7df}
+.screen-bottom{position:absolute;left:15px;right:15px;bottom:15px;
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pad{display:grid;grid-template-columns:repeat(3,44px);
+  grid-template-rows:repeat(3,44px);gap:6px;justify-content:center;margin:18px 0}
+.pad button{padding:0}
+.pad .up{grid-column:2}.pad .left{grid-row:2;grid-column:1}
+.pad .center{grid-row:2;grid-column:2}.pad .right{grid-row:2;grid-column:3}
+.pad .down{grid-row:3;grid-column:2}
+.diagram{position:relative;overflow:hidden;background:#edf5f0;
+  border:1px solid #d7e5dc;border-radius:10px;margin:20px 0}
+.diagram svg{display:block;width:100%;height:auto;max-height:270px}
+.diagram small{display:block;padding:8px 12px;color:#60796b}
+.motion{animation:flow 2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-56}}
+.target-area{display:flex;align-items:center;justify-content:center;height:220px;
+  width:100%;background:#214854;color:white}
+.target{padding:28px;border:2px dashed white;border-radius:8px}
+.selected .target{border:3px solid #46f8ba}
+.tracking .target{animation:tracking 3s ease-in-out infinite alternate}
+@keyframes tracking{to{transform:translateX(45px)}}
+.battery{font-size:60px;text-align:center;color:var(--accent);font-weight:750}
+.source-list a{display:block;padding:12px 0;border-bottom:1px solid var(--line)}
+footer{font-size:13px;color:var(--muted);padding:10px 0}
+[hidden]{display:none!important}
+@media(max-width:1150px){
+  .columns{grid-template-columns:1fr}
+  .guide{max-width:none}
+}
+@media(max-width:760px){
+  .layout{display:block}
+  aside{display:none;border-bottom:1px solid var(--line)}
+  aside.open{display:block}
+  #menuButton{display:block}
+  header{padding:12px 16px}
+  header span{font-size:12px}
+  .page{padding:20px 15px}
+  .card{padding:19px 16px}
+  h1{font-size:25px}
+  .screen{min-height:360px}
+  .screen-top button{font-size:12px;padding:8px}
+  .screen-center{inset:130px 30px 110px}
+  .screen-bottom button{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside id="sidebar">
+  <div class="brand">mini 4 lab<small>Laboratório de aprendizado</small></div>
+  <nav id="navigation" aria-label="Módulos"></nav>
+</aside>
+<main>
+<header>
+  <button id="menuButton" aria-expanded="false" aria-controls="sidebar">☰ Módulos</button>
+  <strong>DJI Mini 4 Pro + DJI RC 2</strong>
+  <span>Versão local • sem conexão com o drone</span>
+</header>
+<div class="page">
+  <div class="heading">
+    <div>
+      <p class="eyebrow">EXPLORE OS CONTROLES</p>
+      <h1 id="pageTitle">Tela de voo</h1>
+      <p>Pratique os ajustes antes de usar o equipamento.</p>
+    </div>
+    <button class="primary" id="startGuide">Configurar 90 m / 500 m</button>
+  </div>
+  <div class="notice">
+    <strong>Simulação didática:</strong> nenhum comando é enviado ao drone.
+    Telas e valores são adaptados para estudo; não são capturas oficiais.
+  </div>
+  <div class="columns">
+    <div>
+      <section id="content" class="card" aria-label="Área de prática"></section>
+      <section id="explanation" class="card"></section>
+      <div id="feedback" class="result" role="status" hidden></div>
+    </div>
+    <section class="card guide" aria-label="Passo a passo">
+      <p class="eyebrow">PRÁTICA GUIADA</p>
+      <h2>Configure os limites</h2>
+      <p class="muted">Entenda o ajuste e quando ele precisa ser reduzido.</p>
+      <div class="stats">
+        <div class="stat"><strong>90 m</strong><small>ALTURA MÁXIMA</small></div>
+        <div class="stat"><strong>500 m</strong><small>DISTÂNCIA MÁXIMA</small></div>
+      </div>
+      <div id="guide"></div>
+    </section>
+  </div>
+  <footer>
+    Material independente, sem vínculo com a DJI. Estado mantido apenas nesta página;
+    recarregar reinicia o exercício. Este arquivo não implementa autenticação para hospedagem.
+  </footer>
+</div>
+</main>
+</div>
+<script>
+"use strict";
+
+const $=id=>document.getElementById(id);
+const MANUAL="https://dl.djicdn.com/downloads/DJI_Mini_4_Pro/20240627/DJI_Mini_4_Pro_User_Manual_en.pdf";
+const S={
+  view:"cockpit",alt:60,dist:200,rth:60,mode:"Normal",avoid:"Frear",
+  loss:"RTH",format:"4K / 30 fps",exposure:"Auto",grid:true,gimbal:-15,
+  channel:"Auto",band:"Automática",battery:82,gps:"Bom sinal",home:true,
+  quick:"Dronie",playing:false,target:false,tracking:false,points:[],
+  cal:"Bússola",calStep:0,guide:-1,checks:[false,false,false],
+  scenario:"compatível",preflight:Array(6).fill(false)
+};
+
+const modules=[
+  ["cockpit","Tela de voo"],["safety","Safety"],["control","Control"],
+  ["camera","Camera"],["transmission","Transmission"],["rth","Retorno • RTH"],
+  ["sensors","Sensores"],["gps","GPS e Home Point"],["battery","Bateria"],
+  ["map","Mapa"],["quickshots","QuickShots"],["activetrack","ActiveTrack"],
+  ["waypoints","Waypoints"],["calibration","Calibração"],
+  ["preflight","Checklist pré-voo"],["sources","Fontes e limitações"]
+];
+
+const notes={
+  cockpit:["Conheça a tela do DJI Fly",
+    "Os indicadores dão acesso ao estado da aeronave e às configurações. Explore os botões desta tela.",
+    "No RC 2, o menu de três pontos da visão da câmera abre as configurações."],
+  safety:["Limites são uma camada de proteção",
+    "A altura indicada no DJI Fly é relativa à decolagem. A distância máxima é horizontal em relação ao ponto de origem.",
+    "O limite legal acima do terreno pode ser diferente da altura mostrada no aplicativo."],
+  control:["Manetes no modo 2",
+    "O manete esquerdo controla altura e giro; o direito controla deslocamentos para frente, trás e lados.",
+    "Cine suaviza a resposta. Sport exige mais espaço para frear e desativa a detecção de obstáculos."],
+  camera:["Enquadramento e exposição",
+    "O gimbal inclina a câmera. Resolução, quadros por segundo e exposição alteram a captura.",
+    "Os arquivos originais são gravados no drone. O cartão do RC 2 tem outra função, como gravação da tela."],
+  transmission:["Enlace não é permissão de voo",
+    "O DJI O4 conecta drone e RC 2. Interferência, obstáculos e orientação das antenas afetam o sinal.",
+    "Mantenha contato visual. Bandas e potência disponíveis variam por região e equipamento."],
+  rth:["Prepare também o retorno",
+    "O RTH retorna ao Home Point registrado. A altura de retorno é um ajuste separado da altura máxima.",
+    "Advanced RTH pode adaptar a trajetória. Não suponha que sempre subirá exatamente ao valor configurado."],
+  sensors:["Detecção pode falhar",
+    "O Mini 4 Pro utiliza visão omnidirecional, dependente de condições adequadas.",
+    "Fios, galhos finos, vidro, água e pouca luz exigem atenção especial. Sensores não substituem o piloto."],
+  gps:["Confira sinal e ponto de origem",
+    "GNSS auxilia o posicionamento. A contagem de satélites, isoladamente, não comprova posição confiável.",
+    "Aguarde o aviso de Home Point e confira a localização no mapa antes de depender do RTH."],
+  battery:["Energia para ir e voltar",
+    "Vento, temperatura, manobras e distância alteram a energia necessária para retornar.",
+    "Não existe uma porcentagem universal segura para iniciar o retorno. A estimativa muda durante o voo."],
+  map:["Leia o mapa junto com o terreno",
+    "O marcador H representa o Home Point. O símbolo de direção ajuda a interpretar a orientação do drone.",
+    "O mapa deste laboratório é fictício, sem escala e sem informações reais do espaço aéreo."],
+  quickshots:["Trajetórias automáticas",
+    "QuickShots executa movimentos predefinidos para filmagem. Selecione modo, alvo e confira o trajeto antes de iniciar.",
+    "Avalie também o espaço atrás, acima e ao lado da aeronave. Os diagramas não calculam rotas seguras."],
+  activetrack:["Acompanhamento de alvo",
+    "No DJI Fly, selecione um alvo compatível e escolha ActiveTrack no FocusTrack.",
+    "Supervisione a trajetória. Perda do alvo, obstáculos e iluminação podem comprometer o acompanhamento."],
+  waypoints:["Planejamento por pontos",
+    "Waypoints combina posições com altura e parâmetros de câmera.",
+    "No equipamento real, revise velocidade, obstáculos, ação final e comportamento na perda do sinal."],
+  calibration:["Cada componente tem seu procedimento",
+    "Bússola, IMU, gimbal e controle usam processos distintos. Siga sempre a orientação mostrada na versão instalada.",
+    "Calibre quando houver indicação ou necessidade identificada. Não calibre a bússola perto de carros ou metal."],
+  preflight:["Checklist não é autorização",
+    "Use os itens como lembretes e faça a verificação real no equipamento e no local.",
+    "Continue avaliando ambiente, bateria e tráfego durante toda a operação."],
+  sources:["Limites desta versão",
+    "Este material é uma reconstrução portátil ainda sem validação em navegador ou em equipamento real.",
+    "Confirme informações no manual e nas orientações oficiais aplicáveis à sua versão, região e operação."]
+};
+
+const calSteps={
+  "Bússola":[
+    "Escolha uma área aberta, afastada de metal e interferência. Abra Safety → Sensors → Compass → Calibrate.",
+    "Siga a rotação horizontal exibida no DJI Fly.",
+    "Siga a posição e rotação vertical indicadas na tela.",
+    "Aguarde a confirmação. Se o erro persistir em local adequado, investigue a causa com o suporte."
+  ],
+  "IMU":[
+    "Com o drone frio e parado em superfície plana, abra Safety → Sensors → IMU → Calibrate.",
+    "Siga cada posição ilustrada no aplicativo, sem mover a aeronave durante a medição.",
+    "Aguarde todas as medições e reinicie se solicitado."
+  ],
+  "Gimbal":[
+    "Remova o protetor e deixe a câmera livre, com o drone apoiado em superfície plana.",
+    "Abra Control → Gimbal Calibration → Auto. Não mova a aeronave.",
+    "Confira a conclusão, os avisos e o horizonte."
+  ],
+  "Controle RC 2":[
+    "Com a aeronave desligada, procure Control → RC Calibration no DJI Fly, quando disponível.",
+    "Centralize os manetes e siga os movimentos completos dos manetes e dials solicitados.",
+    "Confira a conclusão. Nomes e acesso podem variar conforme a versão."
+  ]
+};
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function button(text,action,extra=""){
+  return `<button data-action="${action}" ${extra}>${text}</button>`;
+}
+function choice(label,key,options){
+  return `<label class="field"><span>${label}</span>
+  <select data-key="${key}">${options.map(o=>
+    `<option value="${escapeHtml(o)}" ${S[key]===o?"selected":""}>${escapeHtml(o)}</option>`
+  ).join("")}</select></label>`;
+}
+function numberField(label,key,min,max,unit="m"){
+  return `<label class="field"><span>${label} (${unit})</span>
+    <input type="number" data-key="${key}" min="${min}" max="${max}"
+    step="1" value="${S[key]}" required>
+    <small class="muted">Faixa do exercício: ${min}–${max} ${unit}.</small>
+  </label>`;
+}
+function nav(id){
+  if(!modules.some(m=>m[0]===id))return;
+  S.view=id;S.playing=false;S.tracking=false;
+  $("sidebar").classList.remove("open");
+  $("menuButton").setAttribute("aria-expanded","false");
+  $("feedback").hidden=true;
+  render();
+}
+function feedback(text){
+  $("feedback").textContent=text;
+  $("feedback").hidden=false;
+}
+function mapSvg(){
+  const fixed=[[320,65],[410,110],[405,205],[170,210]];
+  const points=S.points.map(i=>fixed[i]);
+  return `<div class="diagram">
+  <svg viewBox="0 0 560 260" role="img" aria-label="Mapa fictício com ponto de origem e rota">
+    <defs><pattern id="grid" width="35" height="35" patternUnits="userSpaceOnUse">
+      <path d="M35 0H0V35" fill="none" stroke="#d8e5dc"/>
+    </pattern></defs>
+    <rect width="560" height="260" fill="url(#grid)"/>
+    <circle cx="260" cy="135" r="92" fill="none" stroke="#8bb8a3" stroke-dasharray="6 6"/>
+    <polyline points="${[[260,135],...points].map(p=>p.join(",")).join(" ")}"
+      fill="none" stroke="#07816b" stroke-width="3" stroke-dasharray="8 6"
+      class="${S.playing?"motion":""}"/>
+    <circle cx="260" cy="135" r="15" fill="#07816b"/>
+    <text x="260" y="141" text-anchor="middle" fill="white" font-size="16">H</text>
+    <path d="M315 95l-10 25 10-7 10 7Z" fill="#1f78a0"/>
+    ${points.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="14"
+      fill="white" stroke="#07816b" stroke-width="2"/>
+      <text x="${p[0]}" y="${p[1]+5}" text-anchor="middle" fill="#07816b">${i+1}</text>`).join("")}
+    <text x="18" y="28" fill="#607b69">N ↑</text>
+  </svg><small>Diagrama original • sem escala geográfica • não usar para navegação.</small></div>`;
+}
+
+function renderContent(){
+  switch(S.view){
+  case "cockpit":
+    return `<h2>Tela de voo — visão didática</h2>
+    <div class="screen">
+      <div class="screen-top">
+        ${button(S.mode,"nav:control")}
+        ${button("GPS","nav:gps")}
+        ${button("Sensores","nav:sensors")}
+        ${button(S.battery+"%","nav:battery")}
+        ${button("Sinal","nav:transmission")}
+        ${button("••• Safety","nav:safety")}
+      </div>
+      <div class="screen-center"><div><strong>＋</strong>
+        <small>Visor ilustrativo<br>Sem transmissão de câmera real</small></div></div>
+      <div class="screen-bottom">
+        ${button("Mapa","nav:map")}
+        ${button("RTH","nav:rth")}
+        <span>H 0,0 m · D 0,0 m</span>
+        ${button("Câmera","nav:camera")}
+      </div>
+    </div><div class="buttons">
+      ${button("Conhecer os manetes","nav:control")}
+      ${button("QuickShots","nav:quickshots")}
+      ${button("ActiveTrack","nav:activetrack")}
+      ${button("Waypoints","nav:waypoints")}
+    </div>`;
+  case "safety":
+    return `<h2>Proteção de voo</h2>
+      ${numberField("Altura máxima · Max Altitude","alt",20,120)}
+      ${numberField("Distância máxima · Max Distance","dist",50,1000)}
+      <div class="notice">As faixas são didáticas. Firmware, região, classe,
+      conexão ou restrições podem alterar os valores aceitos pelo DJI Fly.</div>
+      ${choice("Resposta a obstáculos","avoid",["Frear","Desviar","Desligado"])}
+      <p>${S.avoid==="Desligado"?"Assistência de obstáculos desligada no exercício.":
+      S.avoid==="Frear"?"Ao detectar um obstáculo, o sistema pode frear.":
+      "O sistema pode tentar contornar o obstáculo. Observe também as laterais."}</p>
+      ${button("Revisar altura de RTH","nav:rth")}`;
+  case "control":
+    return `<h2>Manetes e botões do RC 2</h2>
+      ${choice("Modo de voo","mode",["Cine","Normal","Sport"])}
+      <div class="notice">${S.mode==="Sport"?
+        "Sport desativa a detecção de obstáculos e exige maior espaço de frenagem.":
+        S.mode==="Cine"?"Cine oferece uma resposta suave para enquadrar.":
+        "Normal equilibra resposta e assistência."}</div>
+      <div class="grid2">${["Esquerdo","Direito"].map((side,i)=>
+        `<div><h3>${side} · modo 2</h3><div class="pad">
+        ${[["↑","up"],["←","left"],["●","center"],["→","right"],["↓","down"]].map(([t,c],j)=>
+          button(t,`stick:${i}:${j}`,`class="${c}" aria-label="${side}: ${c}"`)
+        ).join("")}</div></div>`).join("")}</div>
+      <div class="buttons">
+        ${button("Ligar","help:power")}${button("Pausa / RTH","help:rth")}
+        ${button("Gravar / fotografar","help:capture")}${button("Dials e C1/C2","help:dials")}
+      </div>`;
+  case "camera":
+    return `<h2>Câmera e gimbal</h2>
+      ${choice("Resolução e quadros","format",["4K / 30 fps","4K / 60 fps","1080p / 30 fps"])}
+      ${choice("Exposição","exposure",["Auto","Pro"])}
+      <p>${S.exposure==="Auto"?"O aplicativo ajusta a exposição automaticamente.":
+      "Pro permite ajustar parâmetros como ISO e obturador no equipamento real."}</p>
+      <label class="check"><input type="checkbox" data-key="grid" ${S.grid?"checked":""}>
+        Linhas de grade</label>
+      ${numberField("Inclinação do gimbal","gimbal",-90,60,"°")}
+      <div class="result">Captura selecionada: ${S.format}, exposição ${S.exposure},
+      gimbal ${S.gimbal}°. Grade ${S.grid?"ligada":"desligada"}.
+      Não há simulação óptica ou gravação de imagem nesta versão.</div>`;
+  case "transmission":
+    return `<h2>Enlace DJI O4</h2>
+      ${choice("Seleção de canal","channel",["Auto","Manual"])}
+      ${choice("Banda de frequência","band",["Automática","2,4 GHz","5,8 GHz"])}
+      <p>Seleção do exercício: ${S.channel} / ${S.band}.</p>
+      <div class="notice">Esta página não mede interferência. A disponibilidade das bandas,
+      incluindo 5,1 GHz onde suportada, depende da região e versão.</div>
+      ${button("Orientação das antenas","help:antennas")}`;
+  case "rth":
+    return `<h2>Retorno ao Home Point</h2>
+      ${numberField("Altura de RTH","rth",20,120)}
+      ${choice("Ação na perda de sinal — exercício","loss",["RTH","Pairar","Pousar"])}
+      <p>${S.loss==="Pairar"?"Pairar consome bateria e depende das condições de posicionamento.":
+        S.loss==="Pousar"?"Pousar pode ser perigoso sobre água, pessoas ou obstáculos.":
+        "RTH depende do ponto de origem, posicionamento e condições de retorno."}</p>
+      <div class="notice">${S.rth>S.alt?
+        "A altura de RTH está acima da altura máxima do exercício. Revise os ajustes.":
+        "Escolha margem sobre obstáculos e respeite o teto permitido. Se não houver margem segura, mude o plano."}</div>
+      ${button("Verificar retorno","check-rth",'class="primary"')}`;
+  case "sensors":
+    return `<h2>Condições de detecção</h2>
+      ${choice("Resposta a obstáculos","avoid",["Frear","Desviar","Desligado"])}
+      <p>Modo de voo atual: <strong>${S.mode}</strong>.</p>
+      <div class="buttons">
+        ${button("Boa luz e obstáculo visível","sensor:good")}
+        ${button("Fios e galhos","sensor:thin")}
+        ${button("Pouca luz","sensor:dark")}
+      </div>`;
+  case "gps":
+    return `<h2>Posicionamento e origem</h2>
+      ${choice("Condição de GNSS","gps",["Bom sinal","Sinal fraco"])}
+      <div class="result">${S.home?"Home Point confirmado no exercício.":
+      "Home Point não confirmado."}</div>
+      ${mapSvg()}
+      ${button("Confirmar Home Point","confirm-home",
+        `class="primary" ${S.gps==="Sinal fraco"?"disabled":""}`)}
+      <p class="small muted">Com sinal fraco, aguarde em área adequada.
+      Não decole contando com um retorno ainda não disponível.</p>`;
+  case "battery":
+    return `<h2>Energia para retorno e pouso</h2>
+      <div class="battery">${S.battery}%</div>
+      ${numberField("Carga simulada","battery",5,100,"%")}
+      <div class="notice">${S.battery<=20?
+        "Exemplo de carga baixa: priorize um pouso seguro. Não espere chegar a 0%.":
+        S.battery<=40?"Reavalie a margem de energia para retorno, vento e pouso.":
+        "Mesmo com bastante carga, planeje o retorno com antecedência."}</div>
+      <p class="small">As faixas acima são exemplos didáticos, não limiares oficiais do DJI Fly.</p>
+      <p>Confira integridade, encaixe, temperatura e avisos das baterias do drone e RC 2.</p>`;
+  case "map":
+    return `<h2>Orientação no mapa</h2>${mapSvg()}
+      <p><strong>H:</strong> ponto de origem. <strong>▲:</strong> aeronave.</p>
+      <div class="notice">Ao voar sobre terreno descendente, 90 m relativos à decolagem
+      podem corresponder a mais de 90 m acima do solo sob a aeronave.</div>
+      ${button("Revisar origem","nav:gps")}`;
+  case "quickshots":{
+    const paths={
+      Dronie:"M150 165L390 35",Rocket:"M250 175L250 30",
+      Circle:"M120 105a130 65 0 1 0 260 0a130 65 0 1 0-260 0",
+      Helix:"M245 155c-100 40-150-75-10-60s120-90-65-65",
+      Boomerang:"M160 160Q470 30 290 35Q70 50 160 160",
+      Asteroid:"M250 175L340 55a50 30 0 1 0-100 0"
+    };
+    const desc={
+      Dronie:"Afasta e sobe mantendo o alvo enquadrado.",
+      Rocket:"Sobe com a câmera apontada para baixo.",
+      Circle:"Circula ao redor do alvo.",Helix:"Sobe em espiral.",
+      Boomerang:"Percorre trajetória oval com variação de altura.",
+      Asteroid:"Afasta, sobe e combina captura panorâmica."
+    };
+    return `<h2>Movimentos QuickShots</h2>
+      ${choice("Movimento","quick",Object.keys(paths))}
+      <div class="diagram"><svg viewBox="0 0 500 210" role="img"
+        aria-label="Trajetória esquemática ${S.quick}">
+        <path d="${paths[S.quick]}" fill="none" stroke="#07816b" stroke-width="3"
+          stroke-dasharray="8 6" class="${S.playing?"motion":""}"/>
+        <circle cx="250" cy="155" r="9" fill="#29464e"/>
+        <text x="250" y="195" text-anchor="middle" fill="#527064">Alvo</text>
+      </svg><small>Trajetória ilustrativa, sem escala.</small></div>
+      <p>${desc[S.quick]}</p>
+      ${button(S.playing?"Pausar demonstração":"Animar trajetória","toggle-play",'class="primary"')}`;
+  }
+  case "activetrack":
+    return `<h2>Seleção e acompanhamento</h2>
+      <button data-action="select-target"
+        class="target-area ${S.target?"selected":""} ${S.tracking?"tracking":""}">
+        <span class="target">${S.target?"Alvo gráfico selecionado":"Toque para selecionar o alvo"}</span>
+      </button>
+      <div class="buttons">
+        ${button(S.tracking?"Parar acompanhamento":"Iniciar demonstração","track",
+          `class="primary" ${!S.target?"disabled":""}`)}
+        ${button("Limpar alvo","clear-target")}
+      </div>
+      <p>O alvo é um elemento gráfico. Não há reconhecimento de objetos ou controle de voo.</p>`;
+  case "waypoints":
+    return `<h2>Rota de estudo</h2>${mapSvg()}
+      <div class="buttons">
+        ${button("Adicionar ponto","add-point",S.points.length>=4?"disabled":"")}
+        ${button("Remover último","remove-point",S.points.length?"":"disabled")}
+        ${button(S.playing?"Pausar rota":"Demonstrar sequência","toggle-route",
+          `class="primary" ${S.points.length<2?"disabled":""}`)}
+      </div>
+      <p>${S.points.length?S.points.map((_,i)=>`P${i+1} · ${S.alt} m`).join(" → "):
+        "Adicione pelo menos dois pontos."}</p>
+      <p class="small muted">Posições fixas e fictícias. Nenhuma missão é enviada ao drone.</p>`;
+  case "calibration":{
+    const steps=calSteps[S.cal],done=S.calStep>=steps.length;
+    return `<h2>Roteiro de calibração</h2>
+      ${choice("Componente","cal",Object.keys(calSteps))}
+      <p class="eyebrow">${done?"ROTEIRO CONCLUÍDO":`ETAPA ${S.calStep+1} DE ${steps.length}`}</p>
+      <div class="result">${done?
+        "Você revisou o procedimento. Nenhuma calibração real foi executada.":steps[S.calStep]}</div>
+      <progress value="${S.calStep}" max="${steps.length}"></progress>
+      <div class="buttons">
+        ${button("Voltar","cal-back",S.calStep?"":"disabled")}
+        ${button(done?"Rever roteiro":"Próxima etapa","cal-next",'class="primary"')}
+      </div>`;
+  }
+  case "preflight":
+    return `<h2>Checklist pré-voo</h2>
+      ${["Área e acesso ao espaço aéreo verificados",
+        "Clima, vento e contato visual adequados",
+        "Hélices, bateria e encaixes inspecionados",
+        "GNSS e Home Point confirmados",
+        "Limites e RTH revisados no DJI Fly",
+        "Sensores sem alertas e rota livre"].map((t,i)=>
+        `<label class="check"><input type="checkbox" data-preflight="${i}"
+          ${S.preflight[i]?"checked":""}>${t}</label>`).join("")}
+      <progress value="${S.preflight.filter(Boolean).length}" max="6"></progress>
+      <p>${S.preflight.filter(Boolean).length} de 6 lembretes revisados.</p>
+      ${button("Reiniciar checklist","reset-preflight")}`;
+  case "sources":
+    return `<h2>Referências e limitações</h2>
+      <div class="source-list">
+        <a href="${MANUAL}" target="_blank" rel="noreferrer">Manual Mini 4 Pro v1.4</a>
+        <a href="https://www.dji.com/mini-4-pro/downloads" target="_blank" rel="noreferrer">
+          Manuais em português e notas de firmware</a>
+        <a href="https://www.dji.com/mini-4-pro/specs" target="_blank" rel="noreferrer">
+          Especificações do Mini 4 Pro</a>
+        <a href="https://www.dji.com/mini-4-pro/faq" target="_blank" rel="noreferrer">
+          Perguntas frequentes do Mini 4 Pro</a>
+        <a href="https://www.dji.com/rc-2/faq" target="_blank" rel="noreferrer">DJI RC 2</a>
+        <a href="https://www.anac.gov.br/assuntos/legislacao/legislacao-1/resolucoes/2026/resolucao-806"
+          target="_blank" rel="noreferrer">ANAC — Resolução 806/2026</a>
+        <a href="https://www.decea.mil.br/drone/" target="_blank" rel="noreferrer">
+          DECEA — Portal Drone UAS</a>
+        <a href="https://servicos.decea.mil.br/sarpas/" target="_blank" rel="noreferrer">SARPAS</a>
+      </div>
+      <h3 style="margin-top:25px">Brasil e condições locais</h3>
+      <p>A Resolução ANAC 806/2026 estabelece, para operações em seu escopo,
+      limite de 120 m acima do solo. Isso não autoriza automaticamente um voo a 90 m.</p>
+      <p>Consulte o DECEA/SARPAS e as exigências aplicáveis ao peso em voo,
+      finalidade, local e pessoas envolvidas. Configurar 500 m não dispensa contato visual.</p>
+      <h3>Sobre os recursos visuais</h3>
+      <p>Diagramas geométricos originais e visor esquemático. Não há fotografias,
+      capturas oficiais ou mapas reais nesta versão portátil.</p>
+      <p>As interfaces podem mudar com firmware, aplicativo, idioma, classe e região.
+      Referências consultadas em 14/09/2026.</p>`;
+  }
+}
+
+function startGuide(){
+  S.guide=0;S.alt=60;S.dist=200;S.scenario="compatível";
+  S.checks=[false,false,false];nav("safety");
+}
+function canContinue(){
+  if(S.guide===0)return S.checks[0];
+  if(S.guide===2)return S.alt===90;
+  if(S.guide===3)return S.dist===500;
+  if(S.guide===4)return S.checks[1]&&S.checks[2];
+  return true;
+}
+function guideCheckbox(index,text){
+  return `<label class="check"><input type="checkbox" data-guide-check="${index}"
+    ${S.checks[index]?"checked":""}>${text}</label>`;
+}
+function renderGuide(){
+  const labels=["Preparar e verificar o local","Abrir Safety",
+    "Ajustar altura máxima","Ajustar distância máxima","Revisar e confirmar"];
+  let html=`<ol class="steps">${labels.map((t,i)=>
+    `<li class="${S.guide===i?"current":S.guide>i?"done":""}">${t}</li>`
+  ).join("")}</ol>`;
+  if(S.guide<0){
+    $("guide").innerHTML=html+button("Iniciar passo a passo","start-guide",'class="primary"');
+    return;
+  }
+  html+=`<div class="guide-body"><progress value="${S.guide}" max="5"></progress>`;
+  if(S.guide===0){
+    html+=`<p>Com o drone no solo, ligue drone e RC 2. Abra o DJI Fly,
+      confirme conexão, avisos e unidades em metros em Control → Units.</p>
+      ${guideCheckbox(0,"Entendi que devo conferir local, vento, permissões e versões.")}`;
+  }else if(S.guide===1){
+    html+=`<p>Na visão da câmera, toque em <strong>•••</strong>, selecione
+      <strong>Safety / Segurança</strong> e localize
+      <strong>Flight Protection / Proteção de voo</strong>.</p>
+      ${button("Abrir Safety no exercício","nav:safety")}`;
+  }else if(S.guide===2){
+    html+=`<p>Em <strong>Max Altitude</strong>, ajuste <strong>90 m</strong>.
+      Confirme a edição conforme solicitado no equipamento.</p>
+      <p>Valor atual no exercício: <strong>${S.alt} m</strong>.</p>
+      ${button("Abrir campo de altura","nav:safety")}`;
+  }else if(S.guide===3){
+    html+=`<p>Em <strong>Max Distance</strong>, ajuste <strong>500 m</strong>.
+      Não selecione distância ilimitada.</p>
+      <p>Valor atual no exercício: <strong>${S.dist} m</strong>.</p>
+      ${button("Abrir campo de distância","nav:safety")}`;
+  }else if(S.guide===4){
+    html+=`<label class="field"><span>Cenário fictício</span><select id="scenario">
+      ${[["compatível","Condições compatíveis"],["altura","Teto local de 60 m"],
+         ["visibilidade","Visibilidade de 200 m"],["bloqueado","Campo bloqueado no DJI Fly"]]
+         .map(([v,t])=>`<option value="${v}" ${S.scenario===v?"selected":""}>${t}</option>`).join("")}
+      </select></label>
+      <p class="small">Os cenários de 60 m e 200 m são exemplos, não regras regionais.
+      Respeite a condição mais restritiva. Se o campo estiver bloqueado, confira
+      os avisos e o suporte oficial; não force a alteração.</p>
+      ${guideCheckbox(1,"Vou conferir RTH, origem, sensores e bateria no equipamento.")}
+      ${guideCheckbox(2,"Entendo que 90 m / 500 m podem não ser permitidos no local.")}`;
+  }else{
+    const h=S.scenario==="altura"?Math.min(S.alt,60):S.alt;
+    const d=S.scenario==="visibilidade"?Math.min(S.dist,200):S.dist;
+    html+=`<h3>Prática concluída</h3>
+      <p>Ajustes simulados: <strong>${S.alt} m / ${S.dist} m</strong>.</p>
+      <div class="result">${S.scenario==="bloqueado"?
+        "A configuração real está pendente no cenário escolhido. Não voe com base neste resultado.":
+        `Neste cenário, respeite no máximo ${h} m / ${d} m, além de outras restrições reais.`}</div>
+      <p>Reabra Safety no RC 2 para conferir os valores aceitos. Observe o terreno
+      e mantenha contato visual. Este resultado não autoriza o voo.</p>`;
+  }
+  html+=`<div class="buttons">`;
+  if(S.guide>0&&S.guide<5)html+=button("Voltar","guide-back");
+  html+=S.guide===5?button("Repetir prática","start-guide"):
+    button(S.guide===4?"Concluir prática":"Continuar","guide-next",
+      `class="primary" ${canContinue()?"":"disabled"}`);
+  $("guide").innerHTML=html+"</div></div>";
+}
+function render(){
+  $("pageTitle").textContent=modules.find(m=>m[0]===S.view)[1];
+  $("navigation").innerHTML=modules.map(([id,title])=>
+    button(title,"nav:"+id,`class="${id===S.view?"active":""}" ${id===S.view?'aria-current="page"':""}`)
+  ).join("");
+  $("content").innerHTML=renderContent();
+  const n=notes[S.view];
+  $("explanation").innerHTML=`<h2>${n[0]}</h2><p>${n[1]}</p>
+    <p class="muted"><strong>Na prática:</strong> ${n[2]}</p>
+    <a href="${MANUAL}" target="_blank" rel="noreferrer">Consultar manual oficial</a>`;
+  renderGuide();
+}
+
+const helps={
+  power:"Para ligar ou desligar, pressione uma vez e depois mantenha pressionado. Um toque permite conferir a carga.",
+  rth:"Um toque no botão de pausa/RTH freia e paira quando o posicionamento está disponível. Manter pressionado inicia o retorno. Acompanhe os avisos.",
+  capture:"O botão de gravação inicia ou para vídeo. O botão de foco/disparo permite focar e fotografar.",
+  dials:"Dial esquerdo: inclinação do gimbal. Dial direito: zoom compatível. C1 e C2 podem ser configurados no DJI Fly.",
+  antennas:"Oriente as antenas conforme o manual do RC 2, voltadas para a aeronave. Evite obstáculos entre controle e drone."
+};
+
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-action]");
+  if(!el||el.disabled)return;
+  const a=el.dataset.action;
+  if(a.startsWith("nav:"))return nav(a.slice(4));
+  if(a.startsWith("help:"))return feedback(helps[a.slice(5)]);
+  if(a.startsWith("stick:")){
+    const [,side,index]=a.split(":");
+    const moves=[
+      ["Subir.","Girar à esquerda.","Manete centralizado.","Girar à direita.","Descer."],
+      ["Avançar.","Deslocar à esquerda.","Manete centralizado.","Deslocar à direita.","Recuar."]
+    ];
+    return feedback(moves[Number(side)][Number(index)]+
+      " No voo real, observe orientação, espaço e disponibilidade de posicionamento.");
+  }
+  if(a.startsWith("sensor:")){
+    if(S.mode==="Sport")return feedback("Sport desativa a detecção de obstáculos.");
+    if(S.avoid==="Desligado")return feedback("Assistência desligada. O piloto precisa evitar o obstáculo.");
+    return feedback(a==="sensor:good"?
+      `Em condições adequadas, o sistema pode ${S.avoid==="Frear"?"frear":"tentar desviar"}. Monitore o trajeto.`:
+      "A detecção pode falhar nesta condição. Aumente a margem e não dependa dos sensores.");
+  }
+  switch(a){
+    case "start-guide":return startGuide();
+    case "guide-next":if(canContinue())S.guide=Math.min(5,S.guide+1);break;
+    case "guide-back":S.guide=Math.max(0,S.guide-1);break;
+    case "check-rth":return feedback(S.home?
+      "Confirme origem, rota, obstáculos, vento, carga e área de pouso. Supervisione todo o retorno.":
+      "Confirme primeiro o Home Point. Não conte com um retorno a uma origem não confirmada.");
+    case "confirm-home":if(S.gps==="Bom sinal")S.home=true;break;
+    case "toggle-play":S.playing=!S.playing;break;
+    case "select-target":S.target=!S.target;S.tracking=false;break;
+    case "track":if(S.target)S.tracking=!S.tracking;break;
+    case "clear-target":S.target=false;S.tracking=false;break;
+    case "add-point":{
+      const next=[0,1,2,3].find(i=>!S.points.includes(i));
+      if(next!==undefined)S.points.push(next);
+      S.playing=false;break;
+    }
+    case "remove-point":S.points.pop();S.playing=false;break;
+    case "toggle-route":if(S.points.length>=2)S.playing=!S.playing;break;
+    case "cal-back":S.calStep=Math.max(0,S.calStep-1);break;
+    case "cal-next":S.calStep=S.calStep>=calSteps[S.cal].length?0:S.calStep+1;break;
+    case "reset-preflight":S.preflight=Array(6).fill(false);break;
+  }
+  render();
+});
+
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.matches("[data-key]")){
+    const key=el.dataset.key;
+    if(!Object.prototype.hasOwnProperty.call(S,key))return;
+    if(el.type==="number"){
+      if(!el.validity.valid||el.value===""){
+        el.reportValidity();el.value=S[key];return;
+      }
+      S[key]=Number(el.value);
+    }else if(el.type==="checkbox"){
+      S[key]=el.checked;
+    }else{
+      S[key]=el.value;
+    }
+    if(key==="gps"&&S.gps==="Sinal fraco")S.home=false;
+    if(key==="cal")S.calStep=0;
+    if(key==="quick")S.playing=false;
+    render();
+  }else if(el.matches("[data-guide-check]")){
+    S.checks[Number(el.dataset.guideCheck)]=el.checked;renderGuide();
+  }else if(el.matches("[data-preflight]")){
+    S.preflight[Number(el.dataset.preflight)]=el.checked;render();
+  }else if(el.id==="scenario"){
+    S.scenario=el.value;renderGuide();
+  }
+});
+
+$("startGuide").addEventListener("click",startGuide);
+$("menuButton").addEventListener("click",()=>{
+  const open=$("sidebar").classList.toggle("open");
+  $("menuButton").setAttribute("aria-expanded",String(open));
+});
+render();
+</script>
+</body>
+</html>
